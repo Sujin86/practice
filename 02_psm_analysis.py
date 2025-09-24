@@ -1,4 +1,9 @@
 
+# -*- coding: utf-8 -*-
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 # 간단한 PSM 분석: 데이터 불러오기 → 성향점수 추정 → 최근접 매칭 → ATT 계산
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -48,7 +53,7 @@ if len(matches) == 0:
 else:
     treated_indices = [m[0] for m in matches]
     control_indices = [m[1] for m in matches]
-    att = df.loc[treated_indices, 'income'].mean() - df.loc[control_indices, 'income'].mean()
+    att = df.loc[treated_indices, 'outcome'].mean() - df.loc[control_indices, 'outcome'].mean()
     print(f"ATT(처리집단 평균효과): {att:.2f}")
 
     # 매칭 후 성향점수 분포 시각화
@@ -82,11 +87,11 @@ else:
     plt.show()
 
     # ATT(처리집단 평균효과) 결과 분포 시각화
-    pair_effects = [df.loc[t_idx, 'income'] - df.loc[c_idx, 'income'] for t_idx, c_idx in zip(treated_indices, control_indices)]
+    pair_effects = [df.loc[t_idx, 'outcome'] - df.loc[c_idx, 'outcome'] for t_idx, c_idx in zip(treated_indices, control_indices)]
     plt.figure(figsize=(7,4))
     plt.hist(pair_effects, bins=20, edgecolor='black', alpha=0.7)
     plt.axvline(x=att, color='red', linestyle='--', linewidth=2, label=f'ATT: {att:.2f}')
-    plt.xlabel('Income Difference (Treated - Control)')
+    plt.xlabel('Outcome Difference (Treated - Control)')
     plt.ylabel('Frequency')
     plt.title('Distribution of Matched Pair Effects')
     plt.legend()
